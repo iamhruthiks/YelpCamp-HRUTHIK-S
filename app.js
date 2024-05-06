@@ -8,7 +8,9 @@ const methodOverride = require("method-override")
 const Campground = require("./models/campground")
 const catchAysnc = require("./utils/catchAsync")
 const ExpressError = require("./utils/ExpressError")
-const { campgroundSchema } = require("./schemas.js")
+const { campgroundSchema, reviewSchema } = require("./schemas.js")
+const Review = require("./models/review.js")
+
 
 
 
@@ -42,6 +44,19 @@ const validateCampground = (req, res, next) => {
     }
 }
 
+//validating reviews
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body)
+    if (error) {
+        const msg = error.details.map(el => el.message).join(",")
+        throw new ExpressError(msg, 400)
+    } else {
+        next()
+    }
+}
+
+
+
 app.get("/", (req, res) => {
     res.send("home")
 })
@@ -71,7 +86,8 @@ app.post("/campgrounds", validateCampground, catchAysnc(async (req, res, next) =
 }))
 
 app.get("/campgrounds/:id", catchAysnc(async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
+    const campground = await Campground.findById(req.params.id).populate("reviews")
+    //console.log(campground)
     res.render("campgrounds/show.ejs", { campground })
 }))
 
@@ -90,6 +106,26 @@ app.delete("/campgrounds/:id", catchAysnc(async (req, res) => {
     const { id } = req.params
     await Campground.findByIdAndDelete(id)
     res.redirect("/campgrounds")
+}))
+
+//cretaing review
+app.post("/campgrounds/:id/reviews", validateReview, catchAysnc(async (req, res) => {
+    //res.send("review")
+    const campground = await Campground.findById(req.params.id)
+    const review = new Review(req.body.review) //->review, because we a storing all review form data under review
+    campground.reviews.push(review)
+    await review.save()
+    await campground.save()
+    res.redirect(`/campgrounds/${campground._id}`)
+}))
+
+//deleting review
+app.delete("/campgrounds/:id/reviews/:reviewId", catchAysnc(async (req, res) => {
+    //res.send("review deleted")
+    const { id, reviewId } = req.params
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
+    await Review.findByIdAndDelete(req.params.reviewId)
+    res.redirect(`/campgrounds/${id}`)
 }))
 
 app.all("*", (req, res, next) => {
