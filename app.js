@@ -1,18 +1,16 @@
 //creating the basic express app
 const express = require("express")
-const app = express()
 const path = require("path")
 const mongoose = require('mongoose')
 const ejsMate = require("ejs-mate")
 const methodOverride = require("method-override")
-const Campground = require("./models/campground")
-const catchAysnc = require("./utils/catchAsync")
 const ExpressError = require("./utils/ExpressError")
-const { campgroundSchema, reviewSchema } = require("./schemas.js")
-const Review = require("./models/review.js")
+const session = require("express-session")
+const flash = require("connect-flash")
 
 
-
+const campgrounds = require("./routes/campgrounds.js")
+const reviews = require("./routes/reviews.js")
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp-hruthik-s')
@@ -24,6 +22,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp-hruthik-s')
         console.log(err)
     })
 
+const app = express()
+
 app.engine("ejs", ejsMate)
 app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "views"))
@@ -31,31 +31,29 @@ app.set("views", path.join(__dirname, "views"))
 
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride("_method"))
-
-const validateCampground = (req, res, next) => {
-
-    const { error } = campgroundSchema.validate(req.body)
-    //console.log(error)
-    if (error) {
-        const msg = error.details.map(el => el.message).join(",")
-        throw new ExpressError(msg, 400)
-    } else {
-        next()
+app.use(express.static(path.join(__dirname, "public"))) //serving static files
+const sessionConfig = {     // configuring session
+    secret: "thisisasecret",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expries: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1000 milli seconds in a second, 60 seconds in a minute, 60 minutes in an hour, 24 hours in a day and 7 days in a week 
+        maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }
+app.use(session(sessionConfig))
+app.use(flash())
 
-//validating reviews
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body)
-    if (error) {
-        const msg = error.details.map(el => el.message).join(",")
-        throw new ExpressError(msg, 400)
-    } else {
-        next()
-    }
-}
+//setting up flash
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success")
+    res.locals.error = req.flash("error")
+    next()
+})
 
-
+app.use("/campgrounds", campgrounds)
+app.use("/campgrounds/:id/reviews", reviews)
 
 app.get("/", (req, res) => {
     res.send("home")
@@ -67,66 +65,9 @@ app.get("/", (req, res) => {
 //     res.send(camp)
 // })
 
-app.get("/campgrounds", catchAysnc(async (req, res) => {
-    const campgrounds = await Campground.find({})
-    res.render("campgrounds/index.ejs", { campgrounds })
-}))
 
-app.get("/campgrounds/new", (req, res) => {
-    res.render("campgrounds/new.ejs")
-})
 
-app.post("/campgrounds", validateCampground, catchAysnc(async (req, res, next) => {
 
-    // if (!req.body.campground) throw new ExpressError("Invalid Campground Data", 400)
-
-    const campground = new Campground(req.body.campground)
-    await campground.save()
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
-
-app.get("/campgrounds/:id", catchAysnc(async (req, res) => {
-    const campground = await Campground.findById(req.params.id).populate("reviews")
-    //console.log(campground)
-    res.render("campgrounds/show.ejs", { campground })
-}))
-
-app.get("/campgrounds/:id/edit", catchAysnc(async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
-    res.render("campgrounds/edit.ejs", { campground })
-}))
-
-app.put("/campgrounds/:id", validateCampground, catchAysnc(async (req, res) => {
-    const { id } = req.params
-    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground }) //note: ... -> is an objcet and its a spread operator
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
-
-app.delete("/campgrounds/:id", catchAysnc(async (req, res) => {
-    const { id } = req.params
-    await Campground.findByIdAndDelete(id)
-    res.redirect("/campgrounds")
-}))
-
-//cretaing review
-app.post("/campgrounds/:id/reviews", validateReview, catchAysnc(async (req, res) => {
-    //res.send("review")
-    const campground = await Campground.findById(req.params.id)
-    const review = new Review(req.body.review) //->review, because we a storing all review form data under review
-    campground.reviews.push(review)
-    await review.save()
-    await campground.save()
-    res.redirect(`/campgrounds/${campground._id}`)
-}))
-
-//deleting review
-app.delete("/campgrounds/:id/reviews/:reviewId", catchAysnc(async (req, res) => {
-    //res.send("review deleted")
-    const { id, reviewId } = req.params
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
-    await Review.findByIdAndDelete(req.params.reviewId)
-    res.redirect(`/campgrounds/${id}`)
-}))
 
 app.all("*", (req, res, next) => {
     next(new ExpressError("Page Not Found", 404))
