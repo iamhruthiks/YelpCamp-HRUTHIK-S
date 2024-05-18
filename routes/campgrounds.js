@@ -1,24 +1,11 @@
 const express = require("express")
 const router = express.Router()
 const catchAysnc = require("../utils/catchAsync")
-const { campgroundSchema } = require("../schemas.js")
-const { isLoggedIn } = require("../middleware.js")
+const { isLoggedIn, isAuthor, validateCampground } = require("../middleware.js")
 
-const ExpressError = require("../utils/ExpressError")
+
 const Campground = require("../models/campground")
-
-const validateCampground = (req, res, next) => {
-
-    const { error } = campgroundSchema.validate(req.body)
-    //console.log(error)
-    if (error) {
-        const msg = error.details.map(el => el.message).join(",")
-        throw new ExpressError(msg, 400)
-    } else {
-        next()
-    }
-}
-
+const review = require("../models/review.js")
 
 router.get("/", catchAysnc(async (req, res) => {
     const campgrounds = await Campground.find({})
@@ -30,17 +17,23 @@ router.get("/new", isLoggedIn, (req, res) => {
 })
 
 router.post("/", isLoggedIn, validateCampground, catchAysnc(async (req, res, next) => {
-    req.flash("success", "Successfully created a new campground!")
     // if (!req.body.campground) throw new ExpressError("Invalid Campground Data", 400)
 
     const campground = new Campground(req.body.campground)
+    campground.author = req.user._id
     await campground.save()
+    req.flash("success", "Successfully created a new campground!")
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
 router.get("/:id", catchAysnc(async (req, res) => {
-    const campground = await Campground.findById(req.params.id).populate("reviews")
-    //console.log(campground)
+    const campground = await Campground.findById(req.params.id).populate({
+        path: "reviews",
+        populate: {
+            path: "author" // this author is for review
+        }
+    }).populate("author") // this author is for campground
+    console.log(campground)
     if (!campground) {
         req.flash("error", "Cannot find that campground")
         return res.redirect("/campgrounds")
@@ -48,8 +41,9 @@ router.get("/:id", catchAysnc(async (req, res) => {
     res.render("campgrounds/show.ejs", { campground })
 }))
 
-router.get("/:id/edit", isLoggedIn, catchAysnc(async (req, res) => {
-    const campground = await Campground.findById(req.params.id)
+router.get("/:id/edit", isLoggedIn, isAuthor, catchAysnc(async (req, res) => {
+    const { id } = req.params
+    const campground = await Campground.findById(id)
     if (!campground) {
         req.flash("error", "Cannot find that campground")
         return res.redirect("/campgrounds")
@@ -57,14 +51,15 @@ router.get("/:id/edit", isLoggedIn, catchAysnc(async (req, res) => {
     res.render("campgrounds/edit.ejs", { campground })
 }))
 
-router.put("/:id", isLoggedIn, validateCampground, catchAysnc(async (req, res) => {
+router.put("/:id", isLoggedIn, isAuthor, validateCampground, catchAysnc(async (req, res) => {
     const { id } = req.params
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground }) //note: ... -> is an objcet and its a spread operator
     req.flash("success", "Successfully updated the campground!")
     res.redirect(`/campgrounds/${campground._id}`)
 }))
 
-router.delete("/:id", isLoggedIn, catchAysnc(async (req, res) => {
+router.delete("/:id", isLoggedIn, isAuthor, catchAysnc(async (req, res) => {
+
     const { id } = req.params
     await Campground.findByIdAndDelete(id)
     req.flash("success", "Successfully deleted a campground!")
