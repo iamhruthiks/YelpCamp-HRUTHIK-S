@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config()
+}
+
 //creating the basic express app
 const express = require("express")
 const path = require("path")
