@@ -3,7 +3,7 @@ const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/satellite-streets-v12',
     projection: 'globe', // Display the map as a globe, since satellite-v9 defaults to Mercator
-    zoom: 1,
+    zoom: 0.5,
     center: campground.geometry.coordinates
 });
 

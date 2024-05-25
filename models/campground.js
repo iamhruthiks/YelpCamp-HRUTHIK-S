@@ -11,6 +11,9 @@ const ImageSchema = new Schema({
 ImageSchema.virtual("thumbnail").get(function () {
     return this.url.replace("/upload", "/upload/w_200")
 })
+
+const opts = { toJSON: { virtuals: true } }
+
 const CampgroundSchema = new Schema({
     title: String,
     images: [ImageSchema],
@@ -37,7 +40,20 @@ const CampgroundSchema = new Schema({
             ref: "Review"
         }
     ]
+}, opts)
+
+CampgroundSchema.virtual("properties.popUpMarkupTitle").get(function () {
+    return `${this.title}`;
 })
+
+CampgroundSchema.virtual("properties.popUpMarkupId").get(function () {
+    return `${this._id}`;
+})
+
+CampgroundSchema.virtual("properties.popUpMarkupDesc").get(function () {
+    return `${this.description.substring(0, 80)}`;
+})
+
 
 //query middleware -> to delete all the reviews, which are associated with the deleted campgrounds
 CampgroundSchema.post("findOneAndDelete", async function (doc) {
