@@ -1,20 +1,22 @@
 <!-- campground index -->
 <% layout("layouts/boilerplate") %>
-    <div id="map" style="width:100%; height:500px;border:solid rgb(214, 214, 214) 1px"></div>
-    <h1>All Campgrounds</h1>
+    <div class="map-box mb-5">
+        <div id="cluster-map" class="mb-5"></div>
+    </div>
+    <h1 class="mb-3">All Campgrounds</h1>
     <div>
-        <a href="/campgrounds/new">Add Campground</a>
+        <a href="/campgrounds/new" class="btn btn-success mb-3">Add Campground</a>
     </div>
     <!-- styling campground index -->
     <% for(let campground of campgrounds){ %>
-        <div class="card" mb-3>
+        <div class="card mb-3">
             <div class="row">
                 <div class="col-md-4">
                     <% if(campground.images.length){ %>
                         <img class="img-fluid" alt="" src="<%= campground.images[0].url%>">
                         <% } else{%>
                             <img class="img-fluid" alt=""
-                                src="https://res.cloudinary.com/dkl32ao2n/image/upload/v1716500673/YelpCamp/bzai1sikafzh0ni1m7vq.jpg">
+                                src="https://images.unsplash.com/photo-1589352987309-5af00f69bcb3?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D">
                             <% } %>
                 </div>
                 <div class="col-md-8">

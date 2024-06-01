@@ -8,7 +8,7 @@ const map = new mapboxgl.Map({
 });
 
 map.addControl(new mapboxgl.NavigationControl());
-map.scrollZoom.disable();
+// map.scrollZoom.disable();
 
 map.on('style.load', () => {
     map.setFog({}); // Set the default atmosphere style

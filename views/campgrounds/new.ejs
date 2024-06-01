@@ -2,7 +2,7 @@
 <% layout("layouts/boilerplate") %>
     <div class="row">
         <h1 class="text-center">New Campground</h1>
-        <div class="col-6 offset-3"> <!-- offset-3 its just one way of centering the things -->
+        <div class="col-md-6 offset-md-3"> <!-- offset-3 its just one way of centering the things -->
             <form action="/campgrounds" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
                 <!-- novalidate->telling the browser not to validate the form-->
                 <div class="mb-3">
@@ -61,6 +61,6 @@
                     <button class="btn btn-success">Add Campground</button>
                 </div>
             </form>
-            <a href="/campgrounds">All Campgrounds</a>
+            <a href="/campgrounds" class="btn btn-info mb-3">All Campgrounds</a>
         </div>
     </div>

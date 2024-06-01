@@ -1,0 +1,24 @@
+.navbar {
+    background-color: #014f86;
+}
+
+.footer {
+    background-color: #014f86;
+}
+
+#cluster-map {
+    width: 80%;
+    height: 500px;
+    border: solid rgb(214, 214, 214) 1px
+}
+
+#map {
+    width: 100%;
+    height: 300px;
+}
+
+.map-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
