@@ -6,10 +6,12 @@
                 <h4 class="alert-heading">
                     <%= err.message %>
                 </h4>
-                <p>
-                    <code><%= err.stack  %></code>
-                    <!-- code tag is used here to maintain err.stack format and to not break the layout of surrounding elements -->
-                </p>
+                <% if (process.env.NODE_ENV !=="production" ) { %>
+                    <p>
+                        <code><%= err.stack  %></code>
+                        <!-- code tag is used here to maintain err.stack format and to not break the layout of surrounding elements -->
+                    </p>
+                    <% } %>
             </div>
         </div>
     </div>
