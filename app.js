@@ -1,7 +1,7 @@
-// if (process.env.NODE_ENV !== "production") {
-//     require("dotenv").config()
-// }
-require("dotenv").config()
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config()
+}
+// require("dotenv").config()
 
 //creating the basic express app
 const express = require("express")
@@ -16,6 +16,7 @@ const passport = require("passport")
 const LocalStrategy = require("passport-local")
 const User = require("./models/user.js")
 const helmet = require("helmet")
+const MongoStore = require('connect-mongo')(session);
 
 const mongoSanitize = require('express-mongo-sanitize');
 
@@ -23,9 +24,12 @@ const userRoutes = require("./routes/users.js")
 const campgroundRoutes = require("./routes/campgrounds.js")
 const reviewRoutes = require("./routes/reviews.js")
 
+const dbURL = process.env.DB_URL;
+const secret = process.env.SECRET;
+//const db_URL = 'mongodb://127.0.0.1:27017/yelp-camp-hruthik-s';
+// 'mongodb://127.0.0.1:27017/yelp-camp-hruthik-s'
 
-
-mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp-hruthik-s')
+mongoose.connect(dbURL)
     .then(() => {
         console.log("connection to mongoose db is sucesssfull")
     })
@@ -48,9 +52,20 @@ app.use(mongoSanitize({
     replaceWith: '_'
 }));
 
+const store = new MongoStore({
+    url: dbURL,
+    secret,
+    touchAfter: 24 * 3600
+});
+
+store.on("error", function (e) {
+    console.log("session store error", e)
+})
+
 const sessionConfig = {     // configuring session
+    store,
     name: "session",
-    secret: "thisisasecret",
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {

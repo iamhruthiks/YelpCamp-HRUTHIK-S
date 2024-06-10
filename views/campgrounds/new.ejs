@@ -13,7 +13,9 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="location">Location</label>
+                    <label class="form-label" for="location">Location<br>(Please enter the full address, including
+                        state,
+                        country, and pin code)</label>
                     <input class="form-control" type="text" id="location" name="campground[location]" required>
                     <div class="valid-feedback">
                         Looks good!
@@ -29,9 +31,10 @@
                     </div>
                 </div> -->
                 <div class="mb-3">
-                    <label class="form-label" for="price">Campground Price</label>
+                    <label class="form-label" for="price">Campground Price <br>(approximate staying price per
+                        night - price must only be a number)</label>
                     <div class="input-group">
-                        <span class="input-group-text" id="price-lable">$</span>
+                        <span class="input-group-text" id="price-lable">Rs, $, &#8364, &#x20BD or &#xA5</span>
                         <input type="text" class="form-control" id="price" placeholder="0.00" aria-label="price"
                             aria-describedby="price-label" name="campground[price]" required>
                         <div class="valid-feedback">
@@ -40,7 +43,7 @@
                     </div>
                 </div>
                 <div class=" mb-3">
-                    <label class="form-label" for="description">Description</label>
+                    <label class="form-label" for="description">Description <br>(write about the campground)</label>
                     <textarea class="form-control" type="text" id="description" name="campground[description]"
                         required></textarea>
                     <div class="valid-feedback">

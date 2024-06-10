@@ -1,4 +1,5 @@
 const User = require("../models/user")
+const crypto = require("crypto")
 
 module.exports.renderRegister = (req, res) => {
     res.render("users/register.ejs")
@@ -8,7 +9,8 @@ module.exports.Register = async (req, res) => {
     //res.send(req.body)
     try {
         const { email, username, password } = req.body
-        const user = new User({ email, username })
+        const hashedEmail = crypto.createHash("sha256").update(email).digest("hex");
+        const user = new User({ email: hashedEmail, username })
         const registerUser = await User.register(user, password) // register is a helper method provided by passport local mongoose
         //console.log(registerUser)
         req.login(registerUser, err => { // this login() is a helper method provided by passport
