@@ -2,7 +2,8 @@
 <% layout("layouts/boilerplate") %>
     <link rel="stylesheet" href="/stylesheets/stars.css">
     <div class="row">
-        <div class="col-6">
+        <div class="col-10 mx-auto">
+            <div id="map"></div> <br>
             <!-- <div id="map" style="width: 400px; height:300px;"></div> -->
             <div id="carouselExample" class="carousel slide">
                 <div class="carousel-inner">
@@ -41,7 +42,9 @@
                     <li class="list-group-item">Submitted by
                         <%= campground.author.username %>
                     </li>
-                    <li class="list-group-item">$<%= campground.price %>/nigth</li>
+                    <li class="list-group-item">Rs, $, €, ₽ or ¥
+                        <%= campground.price %>/nigth
+                    </li>
                 </ul>
                 <!-- showing and hiding edit/delete buttons -->
                 <% if(currentUser && campground.author.equals(currentUser._id)){ %>
@@ -58,8 +61,8 @@
             </div>
         </div>
         <!-- adding the review form -->
-        <div class="col-6">
-            <div id="map"></div>
+        <div class="col-10 mx-auto mt-5">
+            <!-- <div id="map"></div> -->
             <% if(currentUser) {%> <!--reviews permissions-->
                 <h2>Leave a review</h2>
                 <form action="/campgrounds/<%= campground._id %>/reviews" method="POST" class="mb-3 validated-form"
