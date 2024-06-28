@@ -2,7 +2,7 @@ const User = require("../models/user")
 const crypto = require("crypto")
 
 module.exports.renderRegister = (req, res) => {
-    res.render("users/register.ejs")
+    res.render("users/register.ejs", { ga4_id: process.env.GA4 })
 }
 
 module.exports.Register = async (req, res) => {
@@ -25,7 +25,7 @@ module.exports.Register = async (req, res) => {
 }
 
 module.exports.renderLogin = (req, res) => {
-    res.render("users/login.ejs")
+    res.render("users/login.ejs", { ga4_id: process.env.GA4 })
 }
 
 module.exports.login = (req, res) => {

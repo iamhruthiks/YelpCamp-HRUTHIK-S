@@ -24,12 +24,12 @@ const userRoutes = require("./routes/users.js")
 const campgroundRoutes = require("./routes/campgrounds.js")
 const reviewRoutes = require("./routes/reviews.js")
 
-const dbURL = process.env.DB_URL;
+const db_URL = process.env.DB_URL;
 const secret = process.env.SECRET;
-//const db_URL = 'mongodb://127.0.0.1:27017/yelp-camp-hruthik-s';
+//const dbURL = 'mongodb://127.0.0.1:27017/yelp-camp-hruthik-s';
 // 'mongodb://127.0.0.1:27017/yelp-camp-hruthik-s'
 
-mongoose.connect(dbURL)
+mongoose.connect(db_URL)
     .then(() => {
         console.log("connection to mongoose db is sucesssfull")
     })
@@ -53,7 +53,7 @@ app.use(mongoSanitize({
 }));
 
 const store = new MongoStore({
-    url: dbURL,
+    url: db_URL,
     secret,
     touchAfter: 24 * 3600
 });
@@ -86,6 +86,8 @@ const scriptSrcUrls = [
     "https://kit.fontawesome.com/",
     "https://cdnjs.cloudflare.com/",
     "https://cdn.jsdelivr.net",
+    "https://www.googletagmanager.com/",
+    "https://www.google-analytics.com/",
 ];
 const styleSrcUrls = [
     "https://kit-free.fontawesome.com/",
@@ -101,6 +103,8 @@ const connectSrcUrls = [
     "https://a.tiles.mapbox.com/",
     "https://b.tiles.mapbox.com/",
     "https://events.mapbox.com/",
+    "https://www.googletagmanager.com/",
+    "https://www.google-analytics.com/",
 ];
 const fontSrcUrls = [];
 app.use(
@@ -152,7 +156,7 @@ app.use("/campgrounds", campgroundRoutes)
 app.use("/campgrounds/:id/reviews", reviewRoutes)
 
 app.get("/", (req, res) => {
-    res.render("home.ejs")
+    res.render("home.ejs", { ga4_id: process.env.GA4 })
 })
 
 // app.get("/makecampground", async (req, res) => {

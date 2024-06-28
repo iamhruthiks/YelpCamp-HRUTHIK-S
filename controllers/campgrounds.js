@@ -6,11 +6,11 @@ const { cloudinary } = require("../cloudinary")
 
 module.exports.index = async (req, res) => {
     const campgrounds = await Campground.find({})
-    res.render("campgrounds/index.ejs", { campgrounds })
+    res.render("campgrounds/index.ejs", { campgrounds, ga4_id: process.env.GA4 })
 }
 
 module.exports.renderNewForm = (req, res) => {
-    res.render("campgrounds/new.ejs")
+    res.render("campgrounds/new.ejs", { ga4_id: process.env.GA4 })
 }
 
 module.exports.createCampground = async (req, res, next) => {
@@ -42,7 +42,7 @@ module.exports.showCampgrounds = async (req, res) => {
         req.flash("error", "Cannot find that campground")
         return res.redirect("/campgrounds")
     }
-    res.render("campgrounds/show.ejs", { campground })
+    res.render("campgrounds/show.ejs", { campground, ga4_id: process.env.GA4 })
 }
 
 module.exports.renderEditForm = async (req, res) => {
@@ -52,7 +52,7 @@ module.exports.renderEditForm = async (req, res) => {
         req.flash("error", "Cannot find that campground")
         return res.redirect("/campgrounds")
     }
-    res.render("campgrounds/edit.ejs", { campground })
+    res.render("campgrounds/edit.ejs", { campground, ga4_id: process.env.GA4 })
 }
 
 module.exports.updateCampground = async (req, res) => {

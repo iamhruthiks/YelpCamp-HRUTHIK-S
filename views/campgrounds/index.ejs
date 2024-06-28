@@ -1,5 +1,14 @@
 <!-- campground index -->
 <% layout("layouts/boilerplate") %>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= ga4_id%>"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', '<%= ga4_id%>');
+    </script>
     <div class="map-box mb-5">
         <div id="cluster-map" class="mb-5"></div>
     </div>

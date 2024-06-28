@@ -1,5 +1,14 @@
 <!-- campgrounds new and create -->
 <% layout("layouts/boilerplate") %>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= ga4_id%>"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', '<%= ga4_id%>');
+    </script>
     <div class="row">
         <h1 class="text-center">New Campground</h1>
         <div class="col-md-6 offset-md-3"> <!-- offset-3 its just one way of centering the things -->
