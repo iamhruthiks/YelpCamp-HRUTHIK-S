@@ -1,9 +1,11 @@
 body {
     height: 100vh;
     background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-        url("https://res.cloudinary.com/dkl32ao2n/image/upload/v1719527337/samples/landscapes/home_iztoyp.png");
+        url("https://res.cloudinary.com/dkl32ao2n/image/upload/v1719706334/YelpCamp/home_jlwsqo.png");
     background-size: cover;
     background-position: bottom;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 .nav-link {
