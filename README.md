@@ -1,6 +1,5 @@
 # YelpCamp 
-- YelpCamp is a website where users can create and review campgrounds, utilizing RESTful routes for seamless navigations and interactions.
-- This project was build using Node.js, Express, MongoDB and Bootstrap. Passport.js was used to handle authentication.
+YelpCamp is a website where users can create and review campgrounds, utilizing RESTful routes for seamless navigations and interactions.
 
 ## Features
 - <b>Campground Creation</b>: Registered users can create new campgrounds, providing details such as the campground's name, description, location, and images.
