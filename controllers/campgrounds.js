@@ -56,24 +56,45 @@ module.exports.renderEditForm = async (req, res) => {
 }
 
 module.exports.updateCampground = async (req, res) => {
-    const { id } = req.params
-    //console.log(req.body)
-    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground }) //note: ... -> is an objcet and its a spread operator
-    const img = req.files.map(f => ({ url: f.path, filename: f.filename }))
-    campground.images.push(...img)
-    await campground.save()
+    const { id } = req.params;
+    const campground = await Campground.findById(id);
+
+    if (!campground) {
+        req.flash("error", "Cannot find that campground");
+        return res.redirect("/campgrounds");
+    }
+
+    // Update the campground with the new data
+    campground.title = req.body.campground.title;
+    campground.location = req.body.campground.location;
+    campground.price = req.body.campground.price;
+    campground.description = req.body.campground.description;
+
+    // Update the geometry property
+    const geoData = await geocoder.forwardGeocode({
+        query: req.body.campground.location,
+        limit: 1,
+    }).send();
+    campground.geometry = geoData.body.features[0].geometry;
+
+    // Update the images
+    const img = req.files.map((f) => ({ url: f.path, filename: f.filename }));
+    campground.images.push(...img);
+
+    // Handle deleting images
     if (req.body.deleteImages) {
         for (let filename of req.body.deleteImages) {
-            await cloudinary.uploader.destroy(filename)
+            await cloudinary.uploader.destroy(filename);
         }
-        await campground.updateOne({ $pull: { images: { filename: { $in: req.body.deleteImages } } } })
-
+        await campground.updateOne({
+            $pull: { images: { filename: { $in: req.body.deleteImages } } },
+        });
     }
-    // console.log("after deletion")
-    // console.log(campground.images)
-    req.flash("success", "Successfully updated the campground!")
-    res.redirect(`/campgrounds/${campground._id}`)
-}
+
+    await campground.save();
+    req.flash("success", "Successfully updated the campground!");
+    res.redirect(`/campgrounds/${campground._id}`);
+};
 
 module.exports.deleteCampground = async (req, res) => {
 
